@@ -1,0 +1,274 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Cameraman AI API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: ai
+    description: AI operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /ai/chat:
+    post:
+      operationId: sendChatMessage
+      tags: [ai]
+      summary: Send a chat message
+      description: Send a message and get a streaming AI response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: Streaming text response
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /ai/study:
+    post:
+      operationId: generateStudyContent
+      tags: [ai]
+      summary: Generate study notes or quiz
+      description: Analyze content and generate notes or quiz questions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyRequest"
+      responses:
+        "200":
+          description: Study content response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyResponse"
+
+  /ai/flashcards:
+    post:
+      operationId: generateFlashcards
+      tags: [ai]
+      summary: Generate flashcards from content
+      description: Generate flashcard pairs from provided content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlashcardRequest"
+      responses:
+        "200":
+          description: Generated flashcards
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlashcardResponse"
+
+  /ai/code:
+    post:
+      operationId: generateCode
+      tags: [ai]
+      summary: Generate code
+      description: Generate code based on a description
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CodeRequest"
+      responses:
+        "200":
+          description: Generated code response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeResponse"
+
+  /ai/upload:
+    post:
+      operationId: uploadFile
+      tags: [ai]
+      summary: Upload and extract file content
+      description: Upload a file and extract text content from it
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        "200":
+          description: Extracted file content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    ChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        imageBase64:
+          type: string
+          nullable: true
+      required:
+        - role
+        - content
+
+    ChatRequest:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+        imageBase64:
+          type: string
+          nullable: true
+        imageType:
+          type: string
+          nullable: true
+      required:
+        - messages
+
+    StudyRequest:
+      type: object
+      properties:
+        content:
+          type: string
+        type:
+          type: string
+          enum: [notes, quiz]
+        youtubeUrl:
+          type: string
+          nullable: true
+      required:
+        - content
+        - type
+
+    StudyResponse:
+      type: object
+      properties:
+        result:
+          type: string
+        type:
+          type: string
+      required:
+        - result
+        - type
+
+    FlashcardRequest:
+      type: object
+      properties:
+        content:
+          type: string
+        count:
+          type: integer
+          default: 10
+      required:
+        - content
+
+    Flashcard:
+      type: object
+      properties:
+        front:
+          type: string
+        back:
+          type: string
+      required:
+        - front
+        - back
+
+    FlashcardResponse:
+      type: object
+      properties:
+        flashcards:
+          type: array
+          items:
+            $ref: "#/components/schemas/Flashcard"
+      required:
+        - flashcards
+
+    CodeRequest:
+      type: object
+      properties:
+        language:
+          type: string
+        description:
+          type: string
+        fileContent:
+          type: string
+          nullable: true
+      required:
+        - language
+        - description
+
+    CodeResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        language:
+          type: string
+        explanation:
+          type: string
+      required:
+        - code
+        - language
+        - explanation
+
+    UploadResponse:
+      type: object
+      properties:
+        content:
+          type: string
+        filename:
+          type: string
+        type:
+          type: string
+      required:
+        - content
+        - filename
+        - type
