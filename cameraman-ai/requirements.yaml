@@ -1,0 +1,17 @@
+packages:
+  "framer-motion": "For smooth tab transitions and 3D flashcard flip animations"
+  "react-markdown": "For rendering markdown in chat and study notes"
+  "remark-gfm": "For github flavored markdown support in react-markdown"
+  "react-syntax-highlighter": "For rendering generated code blocks with syntax highlighting"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility to merge tailwind classes safely"
+
+images:
+  - path: "artifacts/cameraman-ai/public/images/avatar.png"
+    description: "A minimal, modern vector illustration of a stylized cameraman holding a camera. The color palette uses warm dark browns, beiges, and cream colors. Flat design, clean lines, suitable for a circular avatar profile picture."
+    aspect_ratio: "1:1"
+
+notes:
+  - Chat streaming requires manual fetch implementation since Orval standard mutations don't support SSE text/event-stream.
+  - File upload endpoints require multipart/form-data.
+  - Using component state for Checklist AI and Flashcard AI manual creation as no database/API was explicitly defined in the OpenAPI schema for these specific persistence layers.
